@@ -20,11 +20,6 @@ module STLC where
     lam : RawTerm (suc n) → RawTerm n
     app : RawTerm n → RawTerm n → RawTerm n
   
-  data RawValue (n : Nat) : Set where
-    var : Fin n → RawValue n
-    pair : RawValue n → RawValue n → RawValue n
-    lam : RawValue (suc n) → RawValue n
-  
   data Context : Nat → Set where
     <> : Context zero
     _,_ : ∀ {n} → Context n → Ty → Context (suc n)
