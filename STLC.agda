@@ -6,9 +6,21 @@ module STLC where
     zero : Nat
     suc : Nat → Nat
   
+  {-# BUILTIN NATURAL Nat #-}
+  {-# BUILTIN ZERO zero #-}
+  {-# BUILTIN SUC suc #-}
+  
+  _+_ : Nat → Nat → Nat
+  zero + n = n
+  suc m + n = suc (m + n)
+  
   data Fin : Nat → Set where
     fzero : ∀ {n} → Fin (suc n)
     fsuc : ∀ {n} → Fin n → Fin (suc n)
+  
+  roll : ∀ {n} (m : Nat) → Fin (suc (m + n))
+  roll zero = fzero
+  roll (suc m) = fsuc (roll m)
   
   data Ty : Set where
     _*_ _=>_ : Ty → Ty → Ty
@@ -24,9 +36,19 @@ module STLC where
     <> : Context zero
     _,_ : ∀ {n} → Context n → Ty → Context (suc n)
   
+  proj : ∀ {n} → Context n → Fin n → Ty
+  proj <> ()
+  proj (_ , A) fzero = A
+  proj (Γ , _) (fsuc i) = proj Γ i
+  
   data _∶_∈_ : ∀ {n} → Fin n → Ty → Context n → Set where
     here : ∀ {n A} {Γ : Context n} → fzero ∶ A ∈ (Γ , A)
     there : ∀ {n A B} {v : Fin n} {Γ : Context n} → v ∶ A ∈ Γ → fsuc v ∶ A ∈ (Γ , B)
+  
+  remember : ∀ {n} {i : Fin n} {Γ} → i ∶ proj Γ i ∈ Γ
+  remember {zero} {()}
+  remember {suc n} {fzero} {_ , A} = here
+  remember {suc n} {fsuc i} {Γ , _} = there remember
   
   module Normal where
     
@@ -37,9 +59,15 @@ module STLC where
       *E2 : ∀ {Γ A B P} → Γ ⊢ P ∶ (A * B) → Γ ⊢ snd P ∶ B
       =>I : ∀ {Γ A B M} → (Γ , A) ⊢ M ∶ B → Γ ⊢ lam M ∶ (A => B)
       =>E : ∀ {Γ A B M N} → Γ ⊢ M ∶ (A => B) → Γ ⊢ N ∶ A → Γ ⊢ app M N ∶ B
-  
-    flip : ∀ {A B C} → <> ⊢ lam (lam (lam (app (app (var (fsuc (fsuc fzero))) (var fzero)) (var (fsuc fzero))))) ∶ ((A => (B => C)) => (B => (A => C)))
-    flip = =>I (=>I (=>I (=>E (=>E (hyp (there (there here))) (hyp here)) (hyp (there here)))))
+    
+    v : ∀ {n} (m : Nat) → RawTerm (suc (m + n))
+    v m = var (roll m)
+    
+    h : ∀ {n} (m : Nat) {Γ : Context (suc (m + n))} → Γ ⊢ var (roll m) ∶ proj Γ (roll m)
+    h m = hyp remember
+    
+    flip : ∀ {A B C} → <> ⊢ lam (lam (lam (app (app (v 2) (v 0)) (v 1)))) ∶ ((A => (B => C)) => (B => (A => C)))
+    flip = =>I (=>I (=>I (=>E (=>E (h 2) (h 0)) (h 1))))
     
     data Term {n} : Context n → Ty → Set where
       var' : ∀ {Γ A} {v : Fin n} → v ∶ A ∈ Γ → Term Γ A
@@ -83,8 +111,14 @@ module STLC where
         =>I : ∀ {Γ A B M} → (Γ , A) ⊢ M ∶ B → Γ ⊢ lam M ∶ (A => B)
         =>E : ∀ {Γ A B M N} → Γ ⊢ M ∶ (A => B) → Γ ⊢ N ∶ A → Γ ⊢ app M N ∶ B
     
-    flip : ∀ {A B C} → <> ⊢ lam (lam (lam (app (app (var (fsuc (fsuc fzero))) (var fzero)) (var (fsuc fzero))))) ∶ ((A => (B => C)) => (B => (A => C)))
-    flip = =>I (=>I (=>I (=>E (=>E (hyp (there (there here))) (hyp here)) (hyp (there here)))))
+    v : ∀ {n} (m : Nat) → RawTerm (suc (m + n))
+    v m = var (roll m)
+    
+    h : ∀ {n} (m : Nat) {Γ : Context (suc (m + n))} → Γ ⊢ var (roll m) ∶ proj Γ (roll m)
+    h m = hyp remember
+    
+    flip : ∀ {A B C} → <> ⊢ lam (lam (lam (app (app (v 2) (v 0)) (v 1)))) ∶ ((A => (B => C)) => (B => (A => C)))
+    flip = =>I (=>I (=>I (=>E (=>E (h 2) (h 0)) (h 1))))
     
     data Term {n} : Context n → Ty → Set where
       var' : ∀ {Γ A} {v : Fin n} → v ∶ A ∈ Γ → Term Γ A
