@@ -98,7 +98,7 @@ module STLC where
     mutual
       data Env : ∀ {n} → Context n → Set where
         <> : Env <>
-        _,_ : ∀ {n} {Γ : Context n} {A} → Env Γ → {M : RawTerm n} → (M ∶ A) → Env (Γ , A)
+        _,_ : ∀ {n} {Γ : Context n} {A} → Env Γ → {M : RawTerm 0} → (M ∶ A) → Env (Γ , A)
       
       _⊢_∶_ : ∀ {n} → Context n → RawTerm n → Ty → Set
       Γ ⊢ M ∶ A = Env Γ → M ∶ A
