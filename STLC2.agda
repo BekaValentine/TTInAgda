@@ -1,4 +1,4 @@
-module Scratch where
+module STLC2 where
 
   data Nat : Set where
     zero : Nat
