@@ -103,7 +103,7 @@ module STLC2 where
     forget' (=>I pb) = =>I (forget' pb)
     forget' (=>E pf px) = =>E (forget' pf) (forget' px)
   
-  module Funny⊢ (S : Set) (_true₀ : Ty → Set) (_∶₀_ : S → Ty → Set) (lower₀ : ∀ {A} → A true₀ → S) where
+  module Funny⊢ (S : Set) (_true₀ : Ty → Set) (_∶₀_ : S → Ty → Set) where
     
     data RawValue : Set where
       var : S → RawValue
