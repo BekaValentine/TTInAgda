@@ -63,9 +63,6 @@ module SemanticsV1 where
   snd' (_ , y) = y
   
   
-  
-  -- This version gives the standard semantics for the STLC by interping to Agda
-  
   [_]ty : Ty → Set
   [ BOOL ]ty = Bool
   [ NAT ]ty = Nat
