@@ -34,34 +34,35 @@ data _⊢_ (Γ : Context) : Ty → Set where
 
 
 
--- Semantics Auxiliary Stuff
-
-data Bool : Set where
-  true false : Bool
-
-if' : ∀ {A : Set} → Bool → A → A → A
-if' true x _ = x
-if' false _ y = y
-
-data Nat : Set where
-  zero : Nat
-  suc : Nat → Nat
-
-rec' : ∀ {A : Set} → Nat → A → (A → A) → A
-rec' zero ze _ = ze
-rec' (suc n) ze su = su (rec' n ze su)
-
-data _×_ (A B : Set) : Set where
-  _,_ : A → B → A × B
-
-fst' : ∀ {A B : Set} → A × B → A
-fst' (x , _) = x
-
-snd' : ∀ {A B : Set} → A × B → B
-snd' (_ , y) = y
-
-
 module SemanticsV1 where
+  
+  -- This version gives the standard semantics for the STLC by interping to Agda
+  
+  data Bool : Set where
+    true false : Bool
+  
+  if' : ∀ {A : Set} → Bool → A → A → A
+  if' true x _ = x
+  if' false _ y = y
+  
+  data Nat : Set where
+    zero : Nat
+    suc : Nat → Nat
+  
+  rec' : ∀ {A : Set} → Nat → A → (A → A) → A
+  rec' zero ze _ = ze
+  rec' (suc n) ze su = su (rec' n ze su)
+  
+  data _×_ (A B : Set) : Set where
+    _,_ : A → B → A × B
+  
+  fst' : ∀ {A B : Set} → A × B → A
+  fst' (x , _) = x
+  
+  snd' : ∀ {A B : Set} → A × B → B
+    snd' (_ , y) = y
+  
+  
   
   -- This version gives the standard semantics for the STLC by interping to Agda
   
