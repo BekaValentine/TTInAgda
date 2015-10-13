@@ -60,7 +60,7 @@ module SemanticsV1 where
   fst' (x , _) = x
   
   snd' : ∀ {A B : Set} → A × B → B
-    snd' (_ , y) = y
+  snd' (_ , y) = y
   
   
   
